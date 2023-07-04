@@ -132,7 +132,7 @@ ENV PATH="${PATH}:${HOME}/.local/bin"
 ENV ImageOS=ubuntu20
 
 RUN echo "PATH=${PATH}" > /etc/environment \
-    && echo "ImageOS=${ImageOS}" >> /etc/environment
+    && echo "ImageOS=${ImageOS}" >> /etc/environment \
 
 # No group definition, as that makes it harder to run docker.
 USER runner

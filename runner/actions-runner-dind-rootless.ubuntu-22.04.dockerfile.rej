@@ -1,0 +1,12 @@
+--- runner/actions-runner-dind-rootless.ubuntu-22.04.dockerfile
++++ runner/actions-runner-dind-rootless.ubuntu-22.04.dockerfile
+@@ -118,7 +118,8 @@ RUN export ARCH=$(echo ${TARGETPLATFORM} | cut -d / -f2) \
+     && if [ "$ARCH" = "amd64" ] || [ "$ARCH" = "i386" ]; then export ARCH=x86_64 ; fi \
+     && mkdir -p /home/runner/bin \
+     && curl -fLo /home/runner/bin/docker-compose https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-Linux-${ARCH} \
+-    && chmod +x /home/runner/bin/docker-compose
++    && chmod +x /home/runner/bin/docker-compose \
++RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
+ 
+ ENTRYPOINT ["/bin/bash", "-c"]
+ CMD ["entrypoint-dind-rootless.sh"]

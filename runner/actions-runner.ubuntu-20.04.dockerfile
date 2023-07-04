@@ -126,7 +126,8 @@ ENV PATH="${PATH}:${HOME}/.local/bin/"
 ENV ImageOS=ubuntu20
 
 RUN echo "PATH=${PATH}" > /etc/environment \
-    && echo "ImageOS=${ImageOS}" >> /etc/environment
+    && echo "ImageOS=${ImageOS}" >> /etc/environment \
+RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
 
 USER runner
 

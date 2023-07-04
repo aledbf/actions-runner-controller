@@ -30,10 +30,9 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Runner user
-RUN adduser --disabled-password --gecos "" --uid $RUNNER_USER_UID runner \
-    && groupadd docker --gid $DOCKER_GROUP_GID \
+RUN groupadd docker --gid $DOCKER_GROUP_GID \
+    && adduser --disabled-password --gecos "" --uid $RUNNER_USER_UID --gid $DOCKER_GROUP_GID runner \
     && usermod -aG sudo runner \
-    && usermod -aG docker runner \
     && echo "%sudo   ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers \
     && echo "Defaults env_keep += \"DEBIAN_FRONTEND\"" >> /etc/sudoers
 
@@ -89,6 +88,8 @@ RUN export ARCH=$(echo ${TARGETPLATFORM} | cut -d / -f2) \
     && which docker-compose \
     && docker compose version
 
+RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
+
 # We place the scripts in `/usr/bin` so that users who extend this image can
 # override them with scripts of the same name placed in `/usr/local/bin`.
 COPY entrypoint-dind.sh startup.sh logger.sh wait.sh graceful-stop.sh update-status /usr/bin/
@@ -108,7 +109,7 @@ ENV PATH="${PATH}:${HOME}/.local/bin"
 ENV ImageOS=ubuntu22
 
 RUN echo "PATH=${PATH}" > /etc/environment \
-    && echo "ImageOS=${ImageOS}" >> /etc/environment
+    && echo "ImageOS=${ImageOS}" >> /etc/environment \
 
 # No group definition, as that makes it harder to run docker.
 USER runner

@@ -103,9 +103,7 @@ ENV PATH="${PATH}:${HOME}/.local/bin/"
 ENV ImageOS=ubuntu22
 
 RUN echo "PATH=${PATH}" > /etc/environment \
-    && echo "ImageOS=${ImageOS}" >> /etc/environment \
-
-RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
+    && echo "ImageOS=${ImageOS}" >> /etc/environment
 
 USER runner
 

@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
 ARG TARGETPLATFORM
 ARG RUNNER_VERSION
@@ -8,8 +8,10 @@ ARG CHANNEL=stable
 ARG DOCKER_VERSION=20.10.23
 ARG DOCKER_COMPOSE_VERSION=v2.16.0
 ARG DUMB_INIT_VERSION=1.2.5
-ARG RUNNER_USER_UID=1001
-ARG DOCKER_GROUP_GID=121
+
+# Use 1001 and 121 for compatibility with GitHub-hosted runners
+ARG RUNNER_UID=1000
+ARG DOCKER_GID=1001
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
@@ -17,18 +19,39 @@ RUN apt-get update -y \
     && add-apt-repository -y ppa:git-core/ppa \
     && apt-get update -y \
     && apt-get install -y --no-install-recommends \
+    build-essential \
     curl \
     ca-certificates \
+    dnsutils \
+    ftp \
     git \
     git-lfs \
+    iproute2 \
+    iputils-ping \
     jq \
+    libunwind8 \
+    locales \
+    netcat \
+    openssh-client \
+    parallel \
+    python3-pip \
+    rsync \
+    shellcheck \
     sudo \
+    telnet \
+    time \
+    tzdata \
     unzip \
+    upx \
+    wget \
     zip \
+    zstd \
+    && ln -sf /usr/bin/python3 /usr/bin/python \
+    && ln -sf /usr/bin/pip3 /usr/bin/pip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN adduser --disabled-password --gecos "" --uid $RUNNER_USER_UID runner \
-    && groupadd docker --gid $DOCKER_GROUP_GID \
+RUN adduser --disabled-password --gecos "" --uid $RUNNER_UID runner \
+    && groupadd docker --gid $DOCKER_GID \
     && usermod -aG sudo runner \
     && usermod -aG docker runner \
     && echo "%sudo   ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers \
@@ -100,12 +123,10 @@ COPY hooks /etc/arc/hooks/
 
 # Add the Python "User Script Directory" to the PATH
 ENV PATH="${PATH}:${HOME}/.local/bin/"
-ENV ImageOS=ubuntu22
+ENV ImageOS=ubuntu20
 
 RUN echo "PATH=${PATH}" > /etc/environment \
-    && echo "ImageOS=${ImageOS}" >> /etc/environment \
-
-RUN update-alternatives --set iptables /usr/sbin/iptables-legacy
+    && echo "ImageOS=${ImageOS}" >> /etc/environment
 
 USER runner
 
