@@ -3,7 +3,7 @@ DOCKER ?= docker
 DEFAULT_RUNNER_NAME ?= ${DOCKER_USER}/actions-runner
 DIND_RUNNER_NAME ?= ${DOCKER_USER}/actions-runner-dind
 DIND_ROOTLESS_RUNNER_NAME ?= ${DOCKER_USER}/actions-runner-dind-rootless
-OS_IMAGE ?= ubuntu-22.04
+OS_IMAGE ?= ubuntu-20.04
 TARGETPLATFORM ?= $(shell arch)
 
 RUNNER_VERSION ?= 2.305.0
@@ -45,21 +45,8 @@ docker-build-set: check-target-platform
 	  --build-arg RUNNER_VERSION=${RUNNER_VERSION} \
 	  --build-arg RUNNER_CONTAINER_HOOKS_VERSION=${RUNNER_CONTAINER_HOOKS_VERSION} \
 	  --build-arg DOCKER_VERSION=${DOCKER_VERSION} \
-	  -f actions-runner.${OS_IMAGE}.dockerfile \
-	  -t ${DEFAULT_RUNNER_NAME}:${OS_IMAGE} .
-	${DOCKER} build \
-	  --build-arg TARGETPLATFORM=${TARGETPLATFORM} \
-	  --build-arg RUNNER_VERSION=${RUNNER_VERSION} \
-	  --build-arg RUNNER_CONTAINER_HOOKS_VERSION=${RUNNER_CONTAINER_HOOKS_VERSION} \
-	  --build-arg DOCKER_VERSION=${DOCKER_VERSION} \
 	  -f actions-runner-dind.${OS_IMAGE}.dockerfile \
 	  -t ${DIND_RUNNER_NAME}:${OS_IMAGE} .
-	${DOCKER} build \
-	  --build-arg TARGETPLATFORM=${TARGETPLATFORM} \
-	  --build-arg RUNNER_VERSION=${RUNNER_VERSION} \
-	  --build-arg DOCKER_VERSION=${DOCKER_VERSION} \
-	  -f actions-runner-dind-rootless.${OS_IMAGE}.dockerfile \
-	  -t "${DIND_ROOTLESS_RUNNER_NAME}:${OS_IMAGE}" .
 
 docker-build-default: check-target-platform
 	${DOCKER} build \

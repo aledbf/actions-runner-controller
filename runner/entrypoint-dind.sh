@@ -64,6 +64,18 @@ if [ -n "${MTU}" ]; then
   sudo ifconfig docker0 mtu "${MTU}" up
 fi
 
+if [ -d "${PRELOAD_DIRECTORY}" ]; then
+    PRELOAD_FILE="${PRELOAD_DIRECTORY}/preload.tar"
+    if [ -f "${PRELOAD_FILE}" ]; then
+        log.notice "Preloading container images..."
+        docker load --input "${PRELOAD_FILE}"
+    else
+        log.warning "Skipping preload of container images."
+    fi
+else
+	log.warning "Skipping preload of container images."
+fi
+
 startup.sh
 SCRIPT
 

@@ -1,5 +1,8 @@
 FROM ubuntu:20.04
 
+ARG RUNNER_UID=33333
+ARG DOCKER_GID=33333
+
 ARG TARGETPLATFORM
 ARG RUNNER_VERSION
 ARG RUNNER_CONTAINER_HOOKS_VERSION
@@ -8,10 +11,6 @@ ARG CHANNEL=stable
 ARG DOCKER_VERSION=20.10.23
 ARG DOCKER_COMPOSE_VERSION=v2.16.0
 ARG DUMB_INIT_VERSION=1.2.5
-
-# Use 1001 and 121 for compatibility with GitHub-hosted runners
-ARG RUNNER_UID=1000
-ARG DOCKER_GID=1001
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y \
@@ -54,8 +53,8 @@ RUN apt-get update -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Runner user
-RUN adduser --disabled-password --gecos "" --uid $RUNNER_UID runner \
-    && groupadd docker --gid $DOCKER_GID \
+RUN groupadd docker --gid $DOCKER_GID \
+    && adduser --disabled-password --gecos "" --uid $RUNNER_UID runner --gid $DOCKER_GID \
     && usermod -aG sudo runner \
     && usermod -aG docker runner \
     && echo "%sudo   ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers \
